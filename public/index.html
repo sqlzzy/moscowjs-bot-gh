@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Полное руководство по созданию Telegram бота</title>
+		<script src="https://telegram.org/js/telegram-web-app.js?57"></script>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-okaidia.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--primary-color: #0088cc;
+				--secondary-color: #f8f9fa;
+				--accent-color: #17a2b8;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background-color: #f5f7fa;
+				color: #333;
+				line-height: 1.6;
+			}
+
+			.container {
+				max-width: 800px;
+				margin: 0 auto;
+			}
+
+			footer {
+				margin: 2rem auto 1rem;
+				width: 100%;
+				text-align: center;
+			}
+
+			header {
+				background-color: var(--primary-color);
+				color: white;
+				padding: 20px 0;
+				margin-bottom: 30px;
+				border-radius: 0 0 10px 10px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+
+			h1 {
+				font-size: 2rem;
+				line-height: 1.2;
+				font-weight: 700;
+			}
+
+			h2 {
+				margin-bottom: 0.5rem;
+				font-size: 1.7rem;
+				line-height: 1.2;
+				font-weight: 700;
+			}
+
+			h3 {
+				margin-bottom: 0.5rem;
+				font-size: 1.5rem;
+				line-height: 1.2;
+				font-weight: 700;
+			}
+
+			a,
+			li,
+			p,
+			span {
+				margin: 0 0 0.5rem;
+				font-size: 1.2rem;
+				line-height: 1.5;
+				font-weight: 400;
+			}
+
+			.step-card {
+				background: white;
+				border-radius: 10px;
+				padding: 25px;
+				margin-bottom: 25px;
+				box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+				border-left: 4px solid var(--accent-color);
+			}
+
+			.step-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.step-title {
+				font-size: 1.3rem;
+				color: var(--primary-color);
+				margin-bottom: 15px;
+				font-weight: 600;
+			}
+
+			.step-content {
+				margin-bottom: 20px;
+			}
+
+			.note {
+				background-color: #fff3cd;
+				border-left: 4px solid #ffc107;
+				padding: 15px;
+				margin: 15px 0;
+				border-radius: 0 4px 4px 0;
+			}
+
+			.warning {
+				background-color: #f8d7da;
+				border-left: 4px solid #dc3545;
+				padding: 15px;
+				margin: 15px 0;
+				border-radius: 0 4px 4px 0;
+			}
+
+            .btn {
+                display: block;
+				background: var(--primary-color);
+				color: white;
+				text-align: center;
+				padding: 15px;
+				border-radius: 8px;
+				text-decoration: none;
+				font-weight: bold;
+				margin: 30px auto;
+				width: 80%;
+				transition: background 0.3s ease;
+            }
+
+			.btn:hover {
+				background: #006699;
+				color: white;
+			}
+
+			.code-block {
+				margin: 20px 0;
+				border-radius: 8px;
+				overflow: hidden;
+			}
+
+			pre {
+				margin: 0;
+			}
+
+			@media (max-width: 768px) {
+				.container {
+					padding: 15px;
+				}
+
+				.step-card {
+					padding: 20px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header class="text-center">
+			<div class="container">
+				<h1>Полное руководство по созданию Telegram бота</h1>
+				<p>От начальной настройки до деплоя на Vercel</p>
+			</div>
+		</header>
+
+		<div class="container">
+			<h2 class="text-center mb-4">Пошаговая инструкция</h2>
+			<div class="mb-4">
+				<h3>@BotFather</h3>
+				<p>
+					<a href="https://t.me/botfather" target="_blank">Бот-помощник</a>, через который создаются боты и
+					WebApp и управляют ими.
+				</p>
+			</div>
+			<div class="mb-4">
+				<h3>Выбор языка программирования</h3>
+				<p>
+					Телеграмм поддерживает различные языки программирования. Наиболее популярными являются Python, Go и
+					Javascript.
+				</p>
+			</div>
+			<div class="mb-4">
+				<h3>Этапы создания проекта</h3>
+				<ol>
+					<li>Создание бота через @BotFather</li>
+					<li>Установка библиотек</li>
+					<li>Настройка сервера</li>
+					<li>Установка команд бота</li>
+					<li>Создание WebApp через @BotFather</li>
+					<li>Создание страницы WebApp</li>
+					<li>Дебаг: заглушка или туннелирование</li>
+					<li>Деплой</li>
+				</ol>
+			</div>
+			<div class="steps-container">
+				<div class="step-1 mb-4">
+					<h3>Создание бота через @BotFather</h3>
+					<ol>
+						<li>Найдите <a href="https://t.me/botfather" target="_blank">@BotFather</a> в Telegram</li>
+						<li>Отправьте команду <code>/newbot</code></li>
+						<li>
+							Следуйте инструкциям:
+							<ul>
+								<li>Введите имя бота (отображается в контактах)</li>
+								<li>Введите username бота (должен заканчиваться на _bot)</li>
+							</ul>
+						</li>
+						<li>Получите API-токен для управления ботом</li>
+					</ol>
+
+					<div class="note"><strong>Важно:</strong> Никому не сообщайте полученный токен!</div>
+				</div>
+				<div class="step-2 mb-4">
+					<h3>Установка необходимых библиотек</h3>
+					<pre><code class="language-bash"># Основные библиотеки
+npm install express dotenv body-parser node-telegram-bot-api
+            
+# Для разработки
+npm install --save-dev nodemon</code></pre>
+					<p><strong>express</strong> — фреймворк для Node.js;</p>
+					<p><strong>dotenv</strong> — автоподгрузка переменных окружения из файла .env;</p>
+					<p><strong>body-parser</strong> — чтение данных из req.body;</p>
+					<p><strong>node-telegram-bot-api</strong> — создание бота;</p>
+					<p><strong>nodemon</strong> — перезапуск сервера после изменений.</p>
+				</div>
+				<div class="step-2 mb-4">
+					<h3>.env</h3>
+					<p>
+						Создаем файл <strong>.env</strong> в структуре проекта и пишем те чувствительные переменные,
+						которые хочется скрыть от посторонних глаз:
+					</p>
+					<pre><code class="language-javascript">BOT_TOKEN=Токен_бота
+PORT=1111
+WEBHOOK_URL=url_your_web_app</code></pre>
+				</div>
+				<div class="step-3 mb-4">
+					<h3>Настройка сервера</h3>
+					<p>
+						Создаем файл <strong>server.js</strong> в структуре проекта и пишем код для настройки сервера:
+					</p>
+					<pre><code class="language-javascript">// Импортируем библиотеки
+import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
+
+// Загружаем переменные окружения из файла .env с помощью метода config.()
+dotenv.config();
+
+// process.env — объект, содержащий все переменные окружения
+const PORT = process.env.PORT || 9999;
+
+// Создаем экземпляр Express-приложения, который используется для настройки сервера
+const app = express();
+
+// Добавляем middleware в Express-приложение для обработки JSON-данных и статических файлов
+app.use(bodyParser.json());
+app.use(express.static("public"));
+
+// Запускам сервер через метод listen, указав порт
+app.listen(PORT, () => {
+    console.log(`Бот и сервер запущены на http://localhost:${PORT}`);
+});</code></pre>
+				</div>
+
+				<div class="step-4 mb-4">
+					<h3>Инициализация бота</h3>
+					<p>В файле <strong>server.js</strong> пишем инициализацию бота:</p>
+					<pre><code class="language-javascript">import TelegramBot from "node-telegram-bot-api";
+
+const token = process.env.BOT_TOKEN;
+
+const bot = new TelegramBot(token, {
+    polling: process.env.NODE_ENV !== "production",
+});
+
+// Webhook обработчик
+app.post(`/bot${token}`, (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
+});
+
+// Обработчик команды /start
+bot.onText(/\\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, 'Привет! Я бот!');
+});</code></pre>
+					<p><strong>Polling</strong> — запрашивает обновления у сервера Telegram (для разработки)</p>
+					<p><strong>Webhook</strong> — Telegram отправляет обновления на ваш сервер (для продакшена)</p>
+				</div>
+
+				<div class="step-4 mb-4">
+					<h3>Установка команд бота</h3>
+					<p>Установить команды бота можно двумя способами:</p>
+					<ul>
+						<li>
+							<p>С помощью метода .setMyCommands()</p>
+							<pre><code class="language-javascript">bot.setMyCommands([
+    { command: "/start", description: "Перезапустить бота" },
+    { command: "/presentation", description: "Презентация" },
+    { command: "/web_app", description: "Мини-приложение" },
+]);</code></pre>
+						</li>
+						<li>
+							<p>С помощью @BotFather в настройках бота</p>
+						</li>
+					</ul>
+				</div>
+				<div class="step-4 mb-4">
+					<h3>Создание WebApp через @BotFather</h3>
+					<ol>
+						<li>Откройте @BotFather</li>
+						<li>Отправьте <code>/newapp</code></li>
+						<li>Выберите своего бота</li>
+						<li>
+							Далее @BotFather даст несколько шагов по настройке приложения: название, фото, URL, и
+							короткий URL приложения для телеграмма.
+						</li>
+					</ol>
+				</div>
+				<div class="step-4 mb-4">
+					<h3>Создание страницы WebApp</h3>
+					<p>Мини-приложение - это обычная веб-страница с интеграцией Telegram API.</p>
+					<p>
+						В структуре проекта создаем папку <strong>public</strong> и в ней создаем файл
+						<strong>index.html</strong>:
+					</p>
+					<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;My WebApp&lt;/title&gt;
+    // Интеграция Telegram API
+    &lt;script src="https://telegram.org/js/telegram-web-app.js"&gt;&lt;/script&gt;
+    &lt;style&gt;
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Мое мини-приложение&lt;/h1&gt;
+    &lt;button onclick="sendData()"&gt;Отправить данные боту&lt;/button&gt;
+
+    &lt;script&gt;
+    function sendData() {
+        Telegram.WebApp.sendData(JSON.stringify({
+        action: 'button_click'
+        }));
+    }
+    
+    // Инициализация WebApp
+    // .expand — разворачивает WebApp на весь экран
+    Telegram.WebApp.expand();
+    // .ready — сообщает Telegram, что приложение загружено и готово к отображению
+    Telegram.WebApp.ready();
+    &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+				</div>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Переходы в WebApp через бота</h3>
+				<ul>
+					<li>
+						<p>Через кнопку в инлайновой клавиатуре</p>
+						<pre><code class="language-javascript">// Отправка кнопки с мини-приложением
+bot.sendMessage(chatId, 'Откройте мини-приложение с полной инструкцией и полезными ссылками:', {
+    reply_markup: {
+        inline_keyboard: [[{
+            text: 'Открыть WebApp',
+            web_app: { url: 'https://yourdomain.com/mini-app' }
+        }]]
+    }
+});</code></pre>
+					</li>
+					<li>
+						<p>Через кнопку в обычной клавиатуре</p>
+						<pre><code class="language-javascript">// Отправка кнопки с мини-приложением
+bot.sendMessage(chatId, 'Откройте мини-приложение с полной инструкцией и полезными ссылками:', {
+    reply_markup: {
+        // отличие от инлайновой клавиатуры в написании keyboard вместо inline_keyboard
+        keyboard: [[{
+            text: 'Открыть WebApp',
+            web_app: { url: 'https://yourdomain.com/mini-app' }
+        }]]
+    }
+});</code></pre>
+					</li>
+					<li>
+						<p>Через кнопку в меню</p>
+						<p>
+							Кнопку можно создать через настройки бота в разделе "Menu button", c помощью команды
+							/setmenubutton в @BotFather и через метод .setChatMenuButton().
+						</p>
+					</li>
+				</ul>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Передача данных</h3>
+				<p>Особенности видов передачи данных между WebApp и ботом</p>
+				<table class="table table-bordered table-hover">
+					<tbody>
+						<tr>
+							<td></td>
+							<td>Инлайновая</td>
+							<td>Обычная</td>
+							<td>Кнопка в меню</td>
+						</tr>
+						<tr>
+							<td>sendData()</td>
+							<td>❌</td>
+							<td>✅</td>
+							<td>❌</td>
+						</tr>
+						<tr>
+							<td>Deeplink-ссылка</td>
+							<td>✅</td>
+							<td>✅</td>
+							<td>✅</td>
+						</tr>
+						<tr>
+							<td>fetch()</td>
+							<td>✅</td>
+							<td>❌</td>
+							<td>✅</td>
+						</tr>
+					</tbody>
+				</table>
+				<p>При каких случаях использовать тот или иной вид передачи данных?</p>
+				<table class="table table-bordered table-hover">
+					<tbody>
+						<tr>
+							<th>Вид передачи данных</th>
+							<th>Когда применять?</th>
+						</tr>
+						<tr>
+							<td>sendData</td>
+							<td>Отправить данные из мини-приложения напрямую боту без HTTP-запросов</td>
+						</tr>
+						<tr>
+							<td>Deeplink-ссылка</td>
+							<td>Передача данных при запуске мини-приложения</td>
+						</tr>
+						<tr>
+							<td>fetch()</td>
+							<td>Нужен двусторонний обмен между мини-приложением и ботом</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Передача данных через sendData()</h3>
+				<pre><code class="language-javascript">// В мини-приложении
+function sendDataToBot() {
+    window.Telegram.WebApp.sendData(
+        JSON.stringify({
+            action: "sendDataMsg",
+        }),
+    );
+}</code></pre>
+				<pre><code class="language-javascript">// В коде бота
+bot.on('message', (msg) => {
+    if (msg.web_app_data) {
+        const data = JSON.parse(msg.web_app_data.data);
+        console.log('Получены данные из WebApp:', data);
+
+        // Ответ пользователю
+        if (data.action === "sendDataMsg") {
+            bot.sendMessage(msg.chat.id, "Это сообщение отправлено с помощью sendData", {
+                parse_mode: "HTML",
+            });
+        }
+    }
+});</code></pre>
+				<button class="send-msg-senddata-btn btn">
+					<i class="bi bi-download"></i>Отправить данные через sendData
+				</button>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Передача данных через Deeplink-ссылку</h3>
+				<pre><code class="language-javascript">// В мини-приложении
+const data = "example_data";
+const base64Data = btoa(data);
+const url = `https://t.me/${bot_username}?start=${base64Data}`;
+Telegram.WebApp.openTelegramLink(url);</code></pre>
+				<pre><code class="language-javascript">// В коде бота
+bot.onText(/\/start (.+)/, async (msg, match) => {
+    try {
+        const data = atob(match[1]);
+
+        await bot.sendMessage(msg.chat.id, `Эти данные ${data} отправлены с помощью deeplink-ссылки`);
+    } catch (err) {
+        console.error("Ошибка декодирования:", err);
+    }
+});</code></pre>
+				<button class="send-msg-deeplink-btn btn">
+					<i class="bi bi-download"></i>Отправить сообщение через deeplink
+				</button>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Передача данных через fetch()</h3>
+				<pre><code class="language-javascript">// В мини-приложении
+fetch(`${urlWebApp}/send-data`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        chat_id: Telegram.WebApp.initDataUnsafe.user?.id,
+        id_msg: 123456,
+    }),
+});</code></pre>
+				<pre><code class="language-javascript">// В коде бота
+app.post("/send-data", (req, res) => {
+    const data = req.body;
+
+    res.json({ status: "OK" });
+
+    bot.sendMessage(data.chat_id, `ID сообщения ${data.id_msg}. Передан через fetch().`);
+});</code></pre>
+				<button class="send-msg-fetch-btn btn">
+					<i class="bi bi-download"></i>Отправить данные через fetch в бота
+				</button>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Дебаг бота и мини-приложения</h3>
+				<h4><i>Заглушка</i></h4>
+				<p>Добавьте этот код в начало вашего Web App (например, в index.html):</p>
+				<pre><code class="language-javascript">// Только для разработки! Удалите в продакшене.
+if (window.location.href.includes('localhost')) {
+  window.Telegram = {
+    WebApp: {
+      initData: 'query_id=test&user=%7B%22id%22%3A12345%7D',
+      initDataUnsafe: { user: { id: 12345 } },
+      sendData: (data) => console.log("Telegram.WebApp.sendData:", data),
+      close: () => console.log("Web App closed"),
+      expand: () => console.log("Web App expanded"),
+    }
+  };
+}
+</code></pre>
+				<p>Что это даёт:</p>
+				<ul>
+					<li>Эмулирует объект Telegram.WebApp для локального тестирования.</li>
+					<li>Позволяет проверять логику без запуска в Telegram.</li>
+				</ul>
+
+				<h4><i>Туннелирование</i></h4>
+				<p>Чтобы Telegram мог отправлять вебхуки на ваш локальный сервер, используйте туннелирование:</p>
+				<ul>
+					<li>
+						<p>Установите:</p>
+						<pre><code class="language-bash">npm install -g localtunnel</code></pre>
+					</li>
+					<li>
+						<p>Запустите туннель для вашего сервера с указанием порта вашего сервера:</p>
+						<pre><code class="language-bash">lt --port 1111</code></pre>
+					</li>
+					<li>
+						<p>Настройте вебхук в Telegram:</p>
+						<pre><code class="language-bash">curl -F "url=${URL}/webhook" https://api.telegram.org/bot${YOUR_BOT_TOKEN}/setWebhook</code></pre>
+					</li>
+				</ul>
+			</div>
+
+			<div class="step-4 mb-4">
+				<h3>Деплой на Vercel</h3>
+				<p>Способы деплоя на Vercel</p>
+				<table class="table table-bordered table-hover">
+					<tbody>
+						<tr>
+							<th>Способ</th>
+							<th>Когда использовать</th>
+							<th>Плюсы</th>
+						</tr>
+						<tr>
+							<td>Git-интеграция</td>
+							<td>Автоматический деплой при git push</td>
+							<td>Простота, Preview-версии</td>
+						</tr>
+						<tr>
+							<td>Vercel CLI</td>
+							<td>Локальные проекты, кастомные сборки</td>
+							<td>Гибкость</td>
+						</tr>
+						<tr>
+							<td>GitHub Actions</td>
+							<td>Сложный CI/CD</td>
+							<td>Полный контроль</td>
+						</tr>
+						<tr>
+							<td>Статические файлы</td>
+							<td>Лендинги, чистый HTML/JS</td>
+							<td>Мгновенный деплой</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<h4><i>Ручной деплой через Vercel CLI</i></h4>
+				<ul>
+					<li>
+						<p>Установите Vercel CLI:</p>
+						<pre><code class="language-bash">npm install -g vercel</code></pre>
+					</li>
+					<li>
+						<p>Войдите в аккаунт:</p>
+						<pre><code class="language-bash">vercel login</code></pre>
+					</li>
+					<li>
+						<p>Задеплойте проект:</p>
+						<pre><code class="language-bash">vercel --prod</code></pre>
+					</li>
+				</ul>
+
+				<h4><i>Автоматический деплой из Git-репозитория</i></h4>
+				<ul>
+					<li>Зайдите в <a href="https://vercel.com/" target="_blank">Vercel Dashboard</a>.</li>
+					<li>Нажмите Add New Project → выберите репозиторий.</li>
+					<li>Укажите настройки.</li>
+					<li>Нажмите Deploy.</li>
+				</ul>
+				<p>Что получите:</p>
+				<ul>
+					<li>Автоматический деплой при каждом git push.</li>
+					<li>Уникальный URL вида project-name.vercel.app.</li>
+					<li>Preview-версии для каждой ветки.</li>
+				</ul>
+			</div>
+
+			<button class="download-btn btn"><i class="bi bi-download"></i>Скачать полную презентацию</button>
+		</div>
+
+		<div class="container">
+			<h2 class="text-center mb-4">Полезные ресурсы</h2>
+			<ul>
+				<li><a href="https://sqlzzy.dev/" target="_blank">Мой блог</a></li>
+				<li><a href="https://t.me/about_webdev" target="_blank">Мой тг-канал о разработке</a></li>
+				<li><a href="https://core.telegram.org/bots" target="_blank">Telegram Bot API</a></li>
+				<li><a href="https://vercel.com/docs" target="_blank">Документация Vercel</a></li>
+				<li>
+					<a href="https://t.me/MiniAppsForLife" target="_blank">Тг-канал про мини-приложения и ботов</a>
+				</li>
+				<li>
+					<a href="https://t.me/devs_cis" target="_blank"
+						>СНГ сообщество разработчиков Telegram Mini Apps и Telegram Bots.
+					</a>
+				</li>
+			</ul>
+		</div>
+
+		<footer>Автор: <a href="https://sqlzzy.dev/" target="_blank">Осипов Сергей</a></footer>
+
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-bash.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-json.min.js"></script>
+		<script>
+			//Раскомментировать, если нужен дебаг через заглушку
+			//stubTelegramApi.js -- файл с заглушкой объекта WebApp
+			// import { WebApp } from "./stubTelegramApi.js";
+
+			// if (typeof window.Telegram === "undefined" || !window.Telegram) {
+			// 	window.Telegram = {
+			// 		WebApp,
+			// 	};
+
+			// 	console.warn("⚠️ Telegram.WebApp не обнаружен — используется заглушка!");
+			// }
+
+			document.addEventListener("DOMContentLoaded", () => {
+				const tg = window.Telegram.WebApp;
+
+				tg.expand();
+				tg.ready();
+
+				tg.setHeaderColor("#0088cc");
+				tg.setBackgroundColor("#f5f7fa");
+
+				function downloadPresentation() {
+					if (window.Telegram.WebApp) {
+						window.Telegram.WebApp.sendData(
+							JSON.stringify({
+								action: "download_presentation",
+							}),
+						);
+					} else {
+						alert("Для скачивания откройте мини-приложение в Telegram");
+					}
+				}
+
+				function sendFetch() {
+					const urlWebApp = "url_your_web_app";
+
+					fetch(`${urlWebApp}/send-data`, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							chat_id: Telegram.WebApp.initDataUnsafe.user?.id,
+							id_msg: 123456,
+						}),
+					});
+				}
+
+				function sendDataMsg() {
+					if (window.Telegram.WebApp) {
+						window.Telegram.WebApp.sendData(
+							JSON.stringify({
+								action: "sendDataMsg",
+							}),
+						);
+					} else {
+						alert("Для отправки сообщения откройте мини-приложение в Telegram");
+					}
+				}
+
+				function openBotFromDeepLink() {
+					const data = "example_data";
+					const base64Data = btoa(data);
+					const url = `https://t.me/MoscowjsTestBot?start=${base64Data}`;
+					Telegram.WebApp.openTelegramLink(url);
+				}
+
+				document.querySelector(".download-btn").addEventListener("click", downloadPresentation);
+
+				document.querySelector(".send-msg-fetch-btn").addEventListener("click", sendFetch);
+				document.querySelector(".send-msg-senddata-btn").addEventListener("click", sendDataMsg);
+				document.querySelector(".send-msg-deeplink-btn").addEventListener("click", openBotFromDeepLink);
+				Prism.highlightAll();
+			});
+		</script>
+	</body>
+</html>
