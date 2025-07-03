@@ -275,7 +275,7 @@ const bot = new TelegramBot(token, {
 });
 
 // Webhook обработчик
-app.post(`/bot${token}`, (req, res) => {
+app.post(`/webhook`, (req, res) => {
     bot.processUpdate(req.body);
     res.sendStatus(200);
 });
@@ -565,7 +565,7 @@ if (window.location.href.includes('localhost')) {
 					</li>
 					<li>
 						<p>Настройте вебхук в Telegram:</p>
-						<pre><code class="language-bash">curl -F "url=${URL}/webhook" https://api.telegram.org/bot${YOUR_BOT_TOKEN}/setWebhook</code></pre>
+						<pre><code class="language-bash">curl -X POST "https://api.telegram.org/bot<TOKEN_BOT>/setWebhook?url=https://your-app.vercel.app/webhook"</code></pre>
 					</li>
 				</ul>
 			</div>
@@ -724,8 +724,9 @@ if (window.location.href.includes('localhost')) {
 
 				function openBotFromDeepLink() {
 					const data = "example_data";
+                    const username_bot = "example_bot";
 					const base64Data = btoa(data);
-					const url = `https://t.me/MoscowjsTestBot?start=${base64Data}`;
+					const url = `https://t.me/${username_bot}?start=${base64Data}`;
 					Telegram.WebApp.openTelegramLink(url);
 				}
 
